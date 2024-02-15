@@ -1,0 +1,17 @@
+Feature('Reg.ru Website Builder');
+
+Scenario('Заказ конструктора с тарифом бесконечный вместе с доменом в зоне .RU', (I) => {
+  I.amOnPage('https://www.reg.ru/web-sites/website-builder/'); // открывает веб-страницу
+  const infiniteTariffPrice = await I.grabTextFrom('//div[contains(@data-plan,'infinite')]//strong[contains(@class,'b-money-amount')]'); // берет цену тарифа
+  I.click('//div[@data-plan = 'infinite']//div[text() = 'Заказать']'); // нажимает заказать услугу
+  I.waitForText('Домен для конструктора', 5); // ждёт текст для проверки
+  I.fillField('input[placeholder='Введите имя домена']', 'romjkeepomer.ru'); // выбирает домен 
+  const dropDownItemRu = '//div[@class='check-domains']//div[@class='choice-item']//b[text()='ru']';
+  const domainPriceRu = dropDownItemRu + '/ancestor::div[@class='choice-item']//span[@class='domain-select-item__price']//b' 
+  const domainPrice = await I.grabTextFrom(domainPriceRu); // берем цену домена
+  I.click(dropDownItemRu); // добавляет домен к услуге
+  const totalPrice = parseFloat(infiniteTariffPrice) + parseFloat(domainPrice); // складывает цену конструктора + домена
+  const footerPrice = await I.grabTextFrom('//span[@class='order-footer-price__price']'); // берет цену заказа из футера
+  I.assert.Equal(totalPrice, footerPrice); // сравнивает обе цены 
+  
+});
